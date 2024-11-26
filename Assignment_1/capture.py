@@ -15,7 +15,7 @@ while(True):
 
     # Brightest spot in the grayscale image
     min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(gray)
-    cv2.circle(gray, max_loc, 10, (0, 255, 255), 2) # Yellow circle
+    cv2.circle(frame, max_loc, 10, (0, 255, 255), 2) # Yellow circle
 
     # REDDEST spot in the image using minMaxLoc()
     # I calculate the red_score for each pixel substracting the maximum of green and blue values from red to ensure the maximum value of only the red pixels
@@ -35,13 +35,13 @@ while(True):
     #             reddest_score = red_score
     #             max_loc = (j, i)
 
-    cv2.circle(gray, max_loc, 10, (0, 0, 255), 2)  # Red circle
+    cv2.circle(frame, max_loc, 10, (0, 0, 255), 2)  # Red circle
 
     # Calculate FPS and display it
     fps = 1 / (current_time - prev_time) if prev_time else 0
     prev_time = current_time
     cv2.putText(
-        gray,
+        frame,
         f"FPS: {fps:.2f}",
         (10, 30),
         cv2.FONT_HERSHEY_SIMPLEX,
@@ -54,7 +54,7 @@ while(True):
     # Get the time it takes to process the frame
     # print((1/fps)*1000 if fps else 0)
 
-    cv2.imshow('frame',gray)
+    cv2.imshow('frame',frame)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
