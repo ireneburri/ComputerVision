@@ -25,13 +25,14 @@ while(True):
     img = cv2.imread('Assignment_2/image.jpg', cv2.IMREAD_GRAYSCALE)
     
     ### MODIFING CANNY EDGE DETECTION PARAMETERS to increase the frame rate
-    edges = cv2.Canny(frame, 100, 200, apertureSize=7, L2gradient=True) # apertureSize=7: larger kernel results in smoother edges and better suppression of noise but can miss finer details, L2Gradient=True: More precise and often results in better-looking edges, but it's computationally more expensive
+    edges = cv2.Canny(frame, 100, 200, apertureSize=3, L2gradient=True) # apertureSize=7: larger kernel results in smoother edges and better suppression of noise but can miss finer details, L2Gradient=True: More precise and often results in better-looking edges, but it's computationally more expensive
 
     edge_pixels = np.column_stack(np.where(edges > 0))  
 
     ### USING ONLY A SUBSET OF EDGE PIXELS FOR LINE FITTING i.e. 90% of the edge pixels
     percentage = 0.9
     edge_pixels = edge_pixels[:int(len(edge_pixels)*percentage)]  
+
 
     x = edge_pixels[:, 1].reshape(-1, 1)  
     y = edge_pixels[:, 0] 
@@ -42,15 +43,15 @@ while(True):
     ransac = RANSACRegressor()
     ransac.fit(x, y)
 
-    line_x = np.linspace(x.min(), x.max(),100).reshape(-1, 1) 
+    line_x = np.array([x.min(), x.max()]).reshape(-1, 1) 
     line_y = ransac.predict(line_x)  
 
     # Define the line starting and ending points
-    start_point = (int(line_x[0][0]), int(line_y[0]))
-    end_point = (int(line_x[1][0]), int(line_y[1]))
+    # start_point = (int(line_x[0][0]), int(line_y[0]))
+    # end_point = (int(line_x[1][0]), int(line_y[1]))
 
     # Drawing the line on the frame
-    cv2.line(frame, start_point, end_point, (0, 255, 0), 2)
+    # cv2.line(frame, start_point, end_point, (0, 255, 0), 2)
 
     for i in range(len(line_x) - 1):
         cv2.line(frame, (int(line_x[i]), int(line_y[i])), (int(line_x[i + 1]), int(line_y[i + 1])), (255, 0, 0), 2)
@@ -70,7 +71,8 @@ while(True):
     )
     # print(f"FPS: {fps:.2f}")
 
-    cv2.imshow('frame_with_line', frame)
+    cv2.imshow('edges', edges)
+    # cv2.imshow('frame_with_line', frame)
 
 
 cap.release()
