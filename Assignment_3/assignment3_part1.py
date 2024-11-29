@@ -27,6 +27,8 @@ import cv2
 import numpy as np
 import os
 import time
+import onnx
+from onnxruntime import InferenceSession
 
 # Constants.
 INPUT_WIDTH = 640
@@ -121,12 +123,14 @@ def main(frame):
     with open(classesFile, 'rt') as f:
         classes = f.read().rstrip('\n').split('\n')
 
-    # Give the weight files to the model and load the network using them.
+    ################ MODEL ################
     # modelWeights = "YOLOv5/simplified_model_s.onnx"
     # modelWeights = "YOLOv5/simplified_model_l.onnx"
-    # modelWeights = "YOLOv5/simplified_yolo_finetuned.onnx"
     modelWeights = "YOLOv5/simplified_model_ft.onnx"
 
+    # Load and check ONNX model
+    onnx.checker.check_model(modelWeights)
+    print("ONNX model is valid.")
 
     if not os.path.exists(modelWeights):
         raise FileNotFoundError(f"The model weights file was not found: {modelWeights}")
@@ -147,6 +151,7 @@ def main(frame):
     cv2.putText(img, label, (20, 40), FONT_FACE, FONT_SCALE,  (0, 0, 255), THICKNESS, cv2.LINE_AA)
     return img
      
+
 if __name__ == '__main__':
     cap = cv2.VideoCapture(0)
     prev_time = 0.00
@@ -156,6 +161,10 @@ if __name__ == '__main__':
 
         frame = main(frame)
         
+        fps = 1 / (current_time - prev_time) if prev_time else 0
+        prev_time = current_time
+        print(f"FPS: {fps:.2f}")
+
         cv2.imshow('frame',frame)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
